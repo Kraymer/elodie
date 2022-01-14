@@ -25,10 +25,21 @@ class Photo(Media):
     :param str source: The fully qualified path to the photo file
     """
 
-    __name__ = 'Photo'
+    __name__ = "Photo"
 
     #: Valid extensions for photo files.
-    extensions = ('arw', 'cr2', 'dng', 'gif', 'heic', 'jpeg', 'jpg', 'nef', 'png', 'rw2')
+    extensions = (
+        "arw",
+        "cr2",
+        "dng",
+        "gif",
+        "heic",
+        "jpeg",
+        "jpg",
+        "nef",
+        "png",
+        "rw2",
+    )
 
     def __init__(self, source=None):
         super(Photo, self).__init__(source)
@@ -41,6 +52,7 @@ class Photo(Media):
         self.pillow = None
         try:
             from PIL import Image
+
             self.pillow = Image
         except ImportError:
             pass
@@ -52,11 +64,13 @@ class Photo(Media):
 
         :returns: time object or None for non-photo files or 0 timestamp
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         source = self.source
-        seconds_since_epoch = min(os.path.getmtime(source), os.path.getctime(source))  # noqa
+        seconds_since_epoch = min(
+            os.path.getmtime(source), os.path.getctime(source)
+        )  # noqa
 
         exif = self.get_exiftool_attributes()
         if not exif:
@@ -69,13 +83,15 @@ class Photo(Media):
         #   the conversion in the local timezone
         # EXIF DateTime is already stored as a timestamp
         # Sourced from https://github.com/photo/frontend/blob/master/src/libraries/models/Photo.php#L500  # noqa
-        for key in self.exif_map['date_taken']:
+        for key in self.exif_map["date_taken"]:
             try:
-                if(key in exif):
-                    if(re.match('\d{4}(-|:)\d{2}(-|:)\d{2}', exif[key]) is not None):  # noqa
-                        dt, tm = exif[key].split(' ')
-                        dt_list = compile(r'-|:').split(dt)
-                        dt_list = dt_list + compile(r'-|:').split(tm)
+                if key in exif:
+                    if (
+                        re.match("\d{4}(-|:)\d{2}(-|:)\d{2}", exif[key]) is not None
+                    ):  # noqa
+                        dt, tm = exif[key].split(" ")
+                        dt_list = compile(r"-|:").split(dt)
+                        dt_list = dt_list + compile(r"-|:").split(tm)
                         dt_list = map(int, dt_list)
                         time_tuple = datetime(*dt_list).timetuple()
                         seconds_since_epoch = time.mktime(time_tuple)
@@ -84,7 +100,7 @@ class Photo(Media):
                 log.error(e)
                 pass
 
-        if(seconds_since_epoch == 0):
+        if seconds_since_epoch == 0:
             return None
 
         return time.gmtime(seconds_since_epoch)
@@ -102,14 +118,14 @@ class Photo(Media):
         # HEIC is not well supported yet so we special case it.
         # https://github.com/python-pillow/Pillow/issues/2806
         extension = os.path.splitext(source)[1][1:].lower()
-        if(extension != 'heic'):
+        if extension != "heic":
             # gh-4 This checks if the source file is an image.
             # It doesn't validate against the list of supported types.
             # We check with imghdr and pillow.
-            if(imghdr.what(source) is None):
+            if imghdr.what(source) is None:
                 # Pillow is used as a fallback and if it's not available we trust
                 #   what imghdr returned.
-                if(self.pillow is None):
+                if self.pillow is None:
                     return False
                 else:
                     # imghdr won't detect all variants of images (https://bugs.python.org/issue28591)
@@ -126,7 +142,7 @@ class Photo(Media):
                     except IOError:
                         return False
 
-                    if(im.format is None):
+                    if im.format is None:
                         return False
-        
+
         return extension in self.extensions

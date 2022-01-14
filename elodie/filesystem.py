@@ -19,22 +19,23 @@ from elodie.localstorage import Db
 from elodie.media.base import Base, get_all_subclasses
 from elodie.plugins.plugins import Plugins
 
+
 class FileSystem(object):
     """A class for interacting with the file system."""
 
     def __init__(self):
         # The default folder path is along the lines of 2017-06-17_01-04-14-dsc_1234-some-title.jpg
         self.default_file_name_definition = {
-            'date': '%Y-%m-%d_%H-%M-%S',
-            'name': '%date-%original_name-%title.%extension',
+            "date": "%Y-%m-%d_%H-%M-%S",
+            "name": "%date-%original_name-%title.%extension",
         }
         # The default folder path is along the lines of 2015-01-Jan/Chicago
         self.default_folder_path_definition = {
-            'date': '%Y-%m-%b',
-            'location': '%city',
-            'full_path': '%date/%album|%location|"{}"'.format(
-                            geolocation.__DEFAULT_LOCATION__
-                         ),
+            "date": "%Y-%m-%b",
+            "location": "%city",
+            "full_path": '%date/%album|%location|"{}"'.format(
+                geolocation.__DEFAULT_LOCATION__
+            ),
         }
         self.cached_file_name_definition = None
         self.cached_folder_path_definition = None
@@ -42,7 +43,7 @@ class FileSystem(object):
         # It captures some additional characters like the unicode checkmark \u2713.
         # See build failures in Python3 here.
         #  https://travis-ci.org/jmathai/elodie/builds/483012902
-        self.whitespace_regex = '[ \t\n\r\f\v]+'
+        self.whitespace_regex = "[ \t\n\r\f\v]+"
 
         # Instantiate a plugins object
         self.plugins = Plugins()
@@ -101,14 +102,15 @@ class FileSystem(object):
         compiled_regex_list = [re.compile(regex) for regex in exclude_regex_list]
         for dirname, dirnames, filenames in os.walk(path):
             for filename in filenames:
-                # If file extension is in `extensions` 
+                # If file extension is in `extensions`
                 # And if file path is not in exclude regexes
                 # Then append to the list
                 filename_path = os.path.join(dirname, filename)
-                if (
-                        os.path.splitext(filename)[1][1:].lower() in extensions and
-                        not self.should_exclude(filename_path, compiled_regex_list, False)
-                    ):
+                if os.path.splitext(filename)[1][
+                    1:
+                ].lower() in extensions and not self.should_exclude(
+                    filename_path, compiled_regex_list, False
+                ):
                     yield filename_path
 
     def get_current_directory(self):
@@ -134,7 +136,7 @@ class FileSystem(object):
             :class:`~elodie.media.video.Video`
         :returns: str or None for non-photo or non-videos
         """
-        if(metadata is None):
+        if metadata is None:
             return None
 
         # Get the name template and definition.
@@ -152,49 +154,50 @@ class FileSystem(object):
             this_value = None
             for this_part in parts:
                 part, mask = this_part
-                if part in ('date', 'day', 'month', 'year'):
-                    this_value = time.strftime(mask, metadata['date_taken'])
+                if part in ("date", "day", "month", "year"):
+                    this_value = time.strftime(mask, metadata["date_taken"])
                     break
-                elif part in ('location', 'city', 'state', 'country'):
+                elif part in ("location", "city", "state", "country"):
                     place_name = geolocation.place_name(
-                        metadata['latitude'],
-                        metadata['longitude']
+                        metadata["latitude"], metadata["longitude"]
                     )
 
-                    location_parts = re.findall('(%[^%]+)', mask)
+                    location_parts = re.findall("(%[^%]+)", mask)
                     this_value = self.parse_mask_for_location(
                         mask,
                         location_parts,
                         place_name,
                     )
                     break
-                elif part in ('album', 'extension', 'title'):
+                elif part in ("album", "extension", "title"):
                     if metadata[part]:
-                        this_value = re.sub(self.whitespace_regex, '-', metadata[part].strip())
+                        this_value = re.sub(
+                            self.whitespace_regex, "-", metadata[part].strip()
+                        )
                         break
-                elif part in ('original_name'):
+                elif part in ("original_name"):
                     # First we check if we have metadata['original_name'].
                     # We have to do this for backwards compatibility because
                     #   we original did not store this back into EXIF.
                     if metadata[part]:
-                        this_value = os.path.splitext(metadata['original_name'])[0]
+                        this_value = os.path.splitext(metadata["original_name"])[0]
                     else:
-                        # We didn't always store original_name so this is 
+                        # We didn't always store original_name so this is
                         #  for backwards compatability.
-                        # We want to remove the hardcoded date prefix we used 
+                        # We want to remove the hardcoded date prefix we used
                         #  to add to the name.
-                        # This helps when re-running the program on file 
+                        # This helps when re-running the program on file
                         #  which were already processed.
                         this_value = re.sub(
-                            '^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}-',
-                            '',
-                            metadata['base_name']
+                            "^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}-",
+                            "",
+                            metadata["base_name"],
                         )
-                        if(len(this_value) == 0):
-                            this_value = metadata['base_name']
+                        if len(this_value) == 0:
+                            this_value = metadata["base_name"]
 
                     # Lastly we want to sanitize the name
-                    this_value = re.sub(self.whitespace_regex, '-', this_value.strip())
+                    this_value = re.sub(self.whitespace_regex, "-", this_value.strip())
                 elif part.startswith('"') and part.endswith('"'):
                     this_value = part[1:-1]
                     break
@@ -207,13 +210,13 @@ class FileSystem(object):
             if this_value is None:
                 name = re.sub(
                     #'[^a-z_]+%{}'.format(part),
-                    '[^a-zA-Z0-9_]+%{}'.format(part),
-                    '',
+                    "[^a-zA-Z0-9_]+%{}".format(part),
+                    "",
                     name,
                 )
             else:
                 name = re.sub(
-                    '%{}'.format(part),
+                    "%{}".format(part),
                     this_value,
                     name,
                 )
@@ -256,37 +259,33 @@ class FileSystem(object):
         # If File is in the config we assume name and its
         #  corresponding values are also present
         config_file = self.default_file_name_definition
-        if('File' in config):
-            config_file = config['File']
+        if "File" in config:
+            config_file = config["File"]
 
         # Find all subpatterns of name that map to the components of the file's
         #  name.
         #  I.e. %date-%original_name-%title.%extension => ['date', 'original_name', 'title', 'extension'] #noqa
-        path_parts = re.findall(
-                         '(\%[a-z_]+)',
-                         config_file['name']
-                     )
+        path_parts = re.findall("(\%[a-z_]+)", config_file["name"])
 
         if not path_parts or len(path_parts) == 0:
-            return (config_file['name'], self.default_file_name_definition)
+            return (config_file["name"], self.default_file_name_definition)
 
         self.cached_file_name_definition = []
         for part in path_parts:
             if part in config_file:
                 part = part[1:]
-                self.cached_file_name_definition.append(
-                    [(part, config_file[part])]
-                )
+                self.cached_file_name_definition.append([(part, config_file[part])])
             else:
                 this_part = []
-                for p in part.split('|'):
+                for p in part.split("|"):
                     p = p[1:]
-                    this_part.append(
-                        (p, config_file[p] if p in config_file else '')
-                    )
+                    this_part.append((p, config_file[p] if p in config_file else ""))
                 self.cached_file_name_definition.append(this_part)
 
-        self.cached_file_name_definition = (config_file['name'], self.cached_file_name_definition)
+        self.cached_file_name_definition = (
+            config_file["name"],
+            self.cached_file_name_definition,
+        )
         return self.cached_file_name_definition
 
     def get_folder_path_definition(self):
@@ -316,32 +315,29 @@ class FileSystem(object):
         # If Directory is in the config we assume full_path and its
         #  corresponding values (date, location) are also present
         config_directory = self.default_folder_path_definition
-        if('Directory' in config):
-            config_directory = config['Directory']
+        if "Directory" in config:
+            config_directory = config["Directory"]
 
         # Find all subpatterns of full_path that map to directories.
         #  I.e. %foo/%bar => ['foo', 'bar']
         #  I.e. %foo/%bar|%example|"something" => ['foo', 'bar|example|"something"']
-        path_parts = re.findall(
-                         '(\%[^/]+)',
-                         config_directory['full_path']
-                     )
+        path_parts = re.findall("(\%[^/]+)", config_directory["full_path"])
 
         if not path_parts or len(path_parts) == 0:
             return self.default_folder_path_definition
 
         self.cached_folder_path_definition = []
         for part in path_parts:
-            part = part.replace('%', '')
+            part = part.replace("%", "")
             if part in config_directory:
                 self.cached_folder_path_definition.append(
                     [(part, config_directory[part])]
                 )
             else:
                 this_part = []
-                for p in part.split('|'):
+                for p in part.split("|"):
                     this_part.append(
-                        (p, config_directory[p] if p in config_directory else '')
+                        (p, config_directory[p] if p in config_directory else "")
                     )
                 self.cached_folder_path_definition.append(this_part)
 
@@ -387,49 +383,45 @@ class FileSystem(object):
 
         # Each part has its own custom logic and we evaluate a single part and return
         #  the evaluated string.
-        if part in ('custom'):
-            custom_parts = re.findall('(%[a-z_]+)', mask)
+        if part in ("custom"):
+            custom_parts = re.findall("(%[a-z_]+)", mask)
             folder = mask
             for i in custom_parts:
-                folder = folder.replace(
-                    i,
-                    self.get_dynamic_path(i[1:], i, metadata)
-                )
+                folder = folder.replace(i, self.get_dynamic_path(i[1:], i, metadata))
             return folder
-        elif part in ('date'):
+        elif part in ("date"):
             config = load_config()
             # If Directory is in the config we assume full_path and its
             #  corresponding values (date, location) are also present
             config_directory = self.default_folder_path_definition
-            if('Directory' in config):
-                config_directory = config['Directory']
-            date_mask = ''
-            if 'date' in config_directory:
-                date_mask = config_directory['date']
-            return time.strftime(date_mask, metadata['date_taken'])
-        elif part in ('day', 'month', 'year'):
-            return time.strftime(mask, metadata['date_taken'])
-        elif part in ('location', 'city', 'state', 'country'):
+            if "Directory" in config:
+                config_directory = config["Directory"]
+            date_mask = ""
+            if "date" in config_directory:
+                date_mask = config_directory["date"]
+            return time.strftime(date_mask, metadata["date_taken"])
+        elif part in ("day", "month", "year"):
+            return time.strftime(mask, metadata["date_taken"])
+        elif part in ("location", "city", "state", "country"):
             place_name = geolocation.place_name(
-                metadata['latitude'],
-                metadata['longitude']
+                metadata["latitude"], metadata["longitude"]
             )
 
-            location_parts = re.findall('(%[^%]+)', mask)
+            location_parts = re.findall("(%[^%]+)", mask)
             parsed_folder_name = self.parse_mask_for_location(
                 mask,
                 location_parts,
                 place_name,
             )
             return parsed_folder_name
-        elif part in ('album', 'camera_make', 'camera_model'):
+        elif part in ("album", "camera_make", "camera_model"):
             if metadata[part]:
                 return metadata[part]
         elif part.startswith('"') and part.endswith('"'):
             # Fallback string
             return part[1:-1]
 
-        return ''
+        return ""
 
     def parse_mask_for_location(self, mask, location_parts, place_name):
         """Takes a mask for a location and interpolates the actual place names.
@@ -469,33 +461,32 @@ class FileSystem(object):
             # component = '%country'
             # key = 'country
             component_full, component, key = re.search(
-                '((%([a-z]+))[^%]*)',
-                loc_part
+                "((%([a-z]+))[^%]*)", loc_part
             ).groups()
 
-            if(key in place_name):
+            if key in place_name:
                 found = True
                 replace_target = component
                 replace_with = place_name[key]
             else:
                 replace_target = component_full
-                replace_with = ''
+                replace_with = ""
 
             folder_name = folder_name.replace(
                 replace_target,
                 replace_with,
             )
 
-        if(not found and folder_name == ''):
-            folder_name = place_name['default']
+        if not found and folder_name == "":
+            folder_name = place_name["default"]
 
         return folder_name
 
     def process_checksum(self, _file, allow_duplicate):
         db = Db()
         checksum = db.checksum(_file)
-        if(checksum is None):
-            log.info('Could not get checksum for %s.' % _file)
+        if checksum is None:
+            log.info("Could not get checksum for %s." % _file)
             return None
 
         # If duplicates are not allowed then we check if we've seen this file
@@ -504,60 +495,56 @@ class FileSystem(object):
         # If we find a checksum match but the file doesn't exist where we
         #  believe it to be then we write a debug log and proceed to import.
         checksum_file = db.get_hash(checksum)
-        if(allow_duplicate is False and checksum_file is not None):
-            if(os.path.isfile(checksum_file)):
-                log.info('%s already at %s.' % (
-                    _file,
-                    checksum_file
-                ))
+        if allow_duplicate is False and checksum_file is not None:
+            if os.path.isfile(checksum_file):
+                log.info("%s already at %s." % (_file, checksum_file))
                 return None
             else:
-                log.info('%s matched checksum but file not found at %s.' % (  # noqa
-                    _file,
-                    checksum_file
-                ))
+                log.info(
+                    "%s matched checksum but file not found at %s."
+                    % (_file, checksum_file)  # noqa
+                )
         return checksum
 
     def process_file(self, _file, destination, media, **kwargs):
         move = False
-        if('move' in kwargs):
-            move = kwargs['move']
+        if "move" in kwargs:
+            move = kwargs["move"]
 
         allow_duplicate = False
-        if('allowDuplicate' in kwargs):
-            allow_duplicate = kwargs['allowDuplicate']
+        if "allowDuplicate" in kwargs:
+            allow_duplicate = kwargs["allowDuplicate"]
 
         stat_info_original = os.stat(_file)
         metadata = media.get_metadata()
 
-        if(not media.is_valid()):
-            print('%s is not a valid media file. Skipping...' % _file)
+        if not media.is_valid():
+            print("%s is not a valid media file. Skipping..." % _file)
             return
 
         checksum = self.process_checksum(_file, allow_duplicate)
-        if(checksum is None):
-            log.info('Original checksum returned None for %s. Skipping...' %
-                     _file)
+        if checksum is None:
+            log.info("Original checksum returned None for %s. Skipping..." % _file)
             return
 
         # Run `before()` for every loaded plugin and if any of them raise an exception
         #  then we skip importing the file and log a message.
         plugins_run_before_status = self.plugins.run_all_before(_file, destination)
-        if(plugins_run_before_status == False):
-            log.warn('At least one plugin pre-run failed for %s' % _file)
+        if plugins_run_before_status == False:
+            log.warn("At least one plugin pre-run failed for %s" % _file)
             return
 
         directory_name = self.get_folder_path(metadata)
         dest_directory = os.path.join(destination, directory_name)
         file_name = self.get_file_name(metadata)
-        dest_path = os.path.join(dest_directory, file_name)        
+        dest_path = os.path.join(dest_directory, file_name)
 
         media.set_original_name()
 
         # If source and destination are identical then
         #  we should not write the file. gh-210
-        if(_file == dest_path):
-            print('Final source and destination path should not be identical')
+        if _file == dest_path:
+            print("Final source and destination path should not be identical")
             return
 
         self.create_directory(dest_directory)
@@ -565,25 +552,25 @@ class FileSystem(object):
         # exiftool renames the original file by appending '_original' to the
         # file name. A new file is written with new tags with the initial file
         # name. See exiftool man page for more details.
-        exif_original_file = _file + '_original'
+        exif_original_file = _file + "_original"
 
         # Check if the source file was processed by exiftool and an _original
         # file was created.
         exif_original_file_exists = False
-        if(os.path.exists(exif_original_file)):
+        if os.path.exists(exif_original_file):
             exif_original_file_exists = True
 
-        if(move is True):
+        if move is True:
             stat = os.stat(_file)
             # Move the processed file into the destination directory
             shutil.move(_file, dest_path)
 
-            if(exif_original_file_exists is True):
+            if exif_original_file_exists is True:
                 # We can remove it as we don't need the initial file.
                 os.remove(exif_original_file)
             os.utime(dest_path, (stat.st_atime, stat.st_mtime))
         else:
-            if(exif_original_file_exists is True):
+            if exif_original_file_exists is True:
                 # Move the newly processed file with any updated tags to the
                 # destination directory
                 shutil.move(_file, dest_path)
@@ -592,7 +579,7 @@ class FileSystem(object):
             else:
                 compatability._copyfile(_file, dest_path)
 
-            # Set the utime based on what the original file contained 
+            # Set the utime based on what the original file contained
             #  before we made any changes.
             # Then set the utime on the destination file based on metadata.
             os.utime(_file, (stat_info_original.st_atime, stat_info_original.st_mtime))
@@ -604,32 +591,40 @@ class FileSystem(object):
 
         # Run `after()` for every loaded plugin and if any of them raise an exception
         #  then we skip importing the file and log a message.
-        plugins_run_after_status = self.plugins.run_all_after(_file, destination, dest_path, metadata)
-        if(plugins_run_after_status == False):
-            log.warn('At least one plugin pre-run failed for %s' % _file)
+        plugins_run_after_status = self.plugins.run_all_after(
+            _file, destination, dest_path, metadata
+        )
+        if plugins_run_after_status == False:
+            log.warn("At least one plugin pre-run failed for %s" % _file)
             return
-
 
         return dest_path
 
     def set_utime_from_metadata(self, metadata, file_path):
-        """ Set the modification time on the file based on the file name.
-        """
+        """Set the modification time on the file based on the file name."""
 
         # Initialize date taken to what's returned from the metadata function.
         # If the folder and file name follow a time format of
         #   YYYY-MM-DD_HH-MM-SS-IMG_0001.JPG then we override the date_taken
-        date_taken = metadata['date_taken']
-        base_name = metadata['base_name']
+        date_taken = metadata["date_taken"]
+        base_name = metadata["base_name"]
         year_month_day_match = re.search(
-            '^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})',
-            base_name
+            "^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})", base_name
         )
-        if(year_month_day_match is not None):
-            (year, month, day, hour, minute, second) = year_month_day_match.groups()  # noqa
+        if year_month_day_match is not None:
+            (
+                year,
+                month,
+                day,
+                hour,
+                minute,
+                second,
+            ) = year_month_day_match.groups()  # noqa
             date_taken = time.strptime(
-                '{}-{}-{} {}:{}:{}'.format(year, month, day, hour, minute, second),  # noqa
-                '%Y-%m-%d %H:%M:%S'
+                "{}-{}-{} {}:{}:{}".format(
+                    year, month, day, hour, minute, second
+                ),  # noqa
+                "%Y-%m-%d %H:%M:%S",
             )
 
             os.utime(file_path, (time.time(), time.mktime(date_taken)))
@@ -640,10 +635,10 @@ class FileSystem(object):
             os.utime(file_path, (time.time(), (date_taken_in_seconds)))
 
     def should_exclude(self, path, regex_list=set(), needs_compiled=False):
-        if(len(regex_list) == 0):
+        if len(regex_list) == 0:
             return False
 
-        if(needs_compiled):
+        if needs_compiled:
             compiled_list = []
             for regex in regex_list:
                 compiled_list.append(re.compile(regex))

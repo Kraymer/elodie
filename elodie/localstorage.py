@@ -29,14 +29,14 @@ class Db(object):
         # If the hash db doesn't exist we create it.
         # Otherwise we only open for reading
         if not os.path.isfile(constants.hash_db):
-            with open(constants.hash_db, 'a'):
+            with open(constants.hash_db, "a"):
                 os.utime(constants.hash_db, None)
 
         self.hash_db = {}
 
         # We know from above that this file exists so we open it
         #   for reading only.
-        with open(constants.hash_db, 'r') as f:
+        with open(constants.hash_db, "r") as f:
             try:
                 self.hash_db = json.load(f)
             except ValueError:
@@ -45,14 +45,14 @@ class Db(object):
         # If the location db doesn't exist we create it.
         # Otherwise we only open for reading
         if not os.path.isfile(constants.location_db):
-            with open(constants.location_db, 'a'):
+            with open(constants.location_db, "a"):
                 os.utime(constants.location_db, None)
 
         self.location_db = []
 
         # We know from above that this file exists so we open it
         #   for reading only.
-        with open(constants.location_db, 'r') as f:
+        with open(constants.location_db, "r") as f:
             try:
                 self.location_db = json.load(f)
             except ValueError:
@@ -66,7 +66,7 @@ class Db(object):
         :param bool write: If true, write the hash db to disk.
         """
         self.hash_db[key] = value
-        if(write is True):
+        if write is True:
             self.update_hash_db()
 
     # Location database
@@ -86,18 +86,18 @@ class Db(object):
         :param bool write: If true, write the location db to disk.
         """
         data = {}
-        data['lat'] = latitude
-        data['long'] = longitude
-        data['name'] = place
+        data["lat"] = latitude
+        data["long"] = longitude
+        data["name"] = place
         self.location_db.append(data)
-        if(write is True):
+        if write is True:
             self.update_location_db()
 
     def backup_hash_db(self):
         """Backs up the hash db."""
         if os.path.isfile(constants.hash_db):
-            mask = strftime('%Y-%m-%d_%H-%M-%S')
-            backup_file_name = '%s-%s' % (constants.hash_db, mask)
+            mask = strftime("%Y-%m-%d_%H-%M-%S")
+            backup_file_name = "%s-%s" % (constants.hash_db, mask)
             copyfile(constants.hash_db, backup_file_name)
             return backup_file_name
 
@@ -120,7 +120,7 @@ class Db(object):
         :returns: str or None
         """
         hasher = hashlib.sha256()
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             buf = f.read(blocksize)
 
             while len(buf) > 0:
@@ -135,7 +135,7 @@ class Db(object):
         :param str key:
         :returns: str or None
         """
-        if(self.check_hash(key) is True):
+        if self.check_hash(key) is True:
             return self.hash_db[key]
         return None
 
@@ -155,18 +155,17 @@ class Db(object):
             # From http://stackoverflow.com/questions/15736995/how-can-i-quickly-estimate-the-distance-between-two-latitude-longitude-points  # noqa
             # convert decimal degrees to radians
 
-            lon1, lat1, lon2, lat2 = list(map(
-                radians,
-                [longitude, latitude, data['long'], data['lat']]
-            ))
+            lon1, lat1, lon2, lat2 = list(
+                map(radians, [longitude, latitude, data["long"], data["lat"]])
+            )
 
             r = 6371000  # radius of the earth in m
             x = (lon2 - lon1) * cos(0.5 * (lat2 + lat1))
             y = lat2 - lat1
             d = r * sqrt(x * x + y * y)
             # Use if closer then threshold_km reuse lookup
-            if(d <= threshold_m and d < last_d):
-                name = data['name']
+            if d <= threshold_m and d < last_d:
+                name = data["name"]
             last_d = d
 
         return name
@@ -178,8 +177,8 @@ class Db(object):
         :returns: tuple(float), or None if the location wasn't in the database.
         """
         for data in self.location_db:
-            if data['name'] == name:
-                return (data['lat'], data['long'])
+            if data["name"] == name:
+                return (data["lat"], data["long"])
 
         return None
 
@@ -196,10 +195,10 @@ class Db(object):
 
     def update_hash_db(self):
         """Write the hash db to disk."""
-        with open(constants.hash_db, 'w') as f:
+        with open(constants.hash_db, "w") as f:
             json.dump(self.hash_db, f)
 
     def update_location_db(self):
         """Write the location db to disk."""
-        with open(constants.location_db, 'w') as f:
+        with open(constants.location_db, "w") as f:
             json.dump(self.location_db, f)

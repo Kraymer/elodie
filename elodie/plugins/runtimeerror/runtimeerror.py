@@ -7,11 +7,13 @@ from __future__ import print_function
 
 from elodie.plugins.plugins import PluginBase
 
+
 class RuntimeError(PluginBase):
 
-    __name__ = 'ThrowError'
+    __name__ = "ThrowError"
 
     """A dummy class to execute plugin actions for tests."""
+
     def __init__(self):
         pass
 

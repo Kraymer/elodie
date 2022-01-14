@@ -25,10 +25,10 @@ def get_exiftool():
 
     :returns: str or None
     """
-    path = find_executable('exiftool')
+    path = find_executable("exiftool")
     # If exiftool wasn't found we try to brute force the homebrew location
     if path is None:
-        path = '/usr/local/bin/exiftool'
+        path = "/usr/local/bin/exiftool"
         if not os.path.isfile(path) or not os.access(path, os.X_OK):
             return None
     return path

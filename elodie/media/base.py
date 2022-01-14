@@ -13,7 +13,7 @@ are used to represent the actual files.
 import mimetypes
 import os
 
-try:        # Py3k compatibility
+try:  # Py3k compatibility
     basestring
 except NameError:
     basestring = (bytes, str)
@@ -26,7 +26,7 @@ class Base(object):
     :param str source: The fully qualified path to the video file.
     """
 
-    __name__ = 'Base'
+    __name__ = "Base"
 
     extensions = ()
 
@@ -62,7 +62,7 @@ class Base(object):
 
         :returns: string or None for a non-video
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         source = self.source
@@ -81,27 +81,27 @@ class Base(object):
 
         :returns: dict or None for non-text files
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
-        if(isinstance(self.metadata, dict) and update_cache is False):
+        if isinstance(self.metadata, dict) and update_cache is False:
             return self.metadata
 
         source = self.source
 
         self.metadata = {
-            'date_taken': self.get_date_taken(),
-            'camera_make': self.get_camera_make(),
-            'camera_model': self.get_camera_model(),
-            'latitude': self.get_coordinate('latitude'),
-            'longitude': self.get_coordinate('longitude'),
-            'album': self.get_album(),
-            'title': self.get_title(),
-            'mime_type': self.get_mimetype(),
-            'original_name': self.get_original_name(),
-            'base_name': os.path.splitext(os.path.basename(source))[0],
-            'extension': self.get_extension(),
-            'directory_path': os.path.dirname(source)
+            "date_taken": self.get_date_taken(),
+            "camera_make": self.get_camera_make(),
+            "camera_model": self.get_camera_model(),
+            "latitude": self.get_coordinate("latitude"),
+            "longitude": self.get_coordinate("longitude"),
+            "album": self.get_album(),
+            "title": self.get_title(),
+            "mime_type": self.get_mimetype(),
+            "original_name": self.get_original_name(),
+            "base_name": os.path.splitext(os.path.basename(source))[0],
+            "extension": self.get_extension(),
+            "directory_path": os.path.dirname(source),
         }
 
         return self.metadata
@@ -111,12 +111,12 @@ class Base(object):
 
         :returns: str or None for unsupported files.
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         source = self.source
         mimetype = mimetypes.guess_type(source)
-        if(mimetype is None):
+        if mimetype is None:
             return None
 
         return mimetype[0]
@@ -148,8 +148,7 @@ class Base(object):
         return os.path.splitext(source)[1][1:].lower() in self.extensions
 
     def reset_cache(self):
-        """Resets any internal cache
-        """
+        """Resets any internal cache"""
         self.metadata = None
 
     def set_album(self, name):
@@ -167,12 +166,12 @@ class Base(object):
         metadata = self.get_metadata()
 
         # If this file has an album already set we do not overwrite EXIF
-        if(not isinstance(metadata, dict) or metadata['album'] is not None):
+        if not isinstance(metadata, dict) or metadata["album"] is not None:
             return False
 
-        folder = os.path.basename(metadata['directory_path'])
+        folder = os.path.basename(metadata["directory_path"])
         # If folder is empty we skip
-        if(len(folder) == 0):
+        if len(folder) == 0:
             return False
 
         self.set_album(folder)
@@ -191,7 +190,7 @@ class Base(object):
             removed).
         """
         self.get_metadata()
-        self.metadata['base_name'] = new_basename
+        self.metadata["base_name"] = new_basename
 
     def set_metadata(self, **kwargs):
         """Method to manually update attributes in metadata.
@@ -200,7 +199,7 @@ class Base(object):
         """
         metadata = self.get_metadata()
         for key in kwargs:
-            if(key in metadata):
+            if key in metadata:
                 self.metadata[key] = kwargs[key]
 
     def set_original_name(self):
@@ -211,8 +210,7 @@ class Base(object):
 
     @classmethod
     def get_class_by_file(cls, _file, classes):
-        """Static method to get a media object by file.
-        """
+        """Static method to get a media object by file."""
         if not isinstance(_file, basestring) or not os.path.isfile(_file):
             return None
 
@@ -220,7 +218,7 @@ class Base(object):
 
         if len(extension) > 0:
             for i in classes:
-                if(extension in i.extensions):
+                if extension in i.extensions:
                     return i(_file)
 
         return None
@@ -235,8 +233,7 @@ class Base(object):
 
 
 def get_all_subclasses(cls=None):
-    """Module method to get all subclasses of Base.
-    """
+    """Module method to get all subclasses of Base."""
     subclasses = set()
 
     this_class = Base

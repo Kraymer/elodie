@@ -11,9 +11,10 @@ from json import dumps
 
 from elodie import constants
 
+
 def all(message):
     _print(message)
-    
+
 
 def info(message):
     _print_debug(message)
@@ -23,7 +24,7 @@ def info_json(payload):
     _print_debug(dumps(payload))
 
 
-def progress(message='.', new_line=False):
+def progress(message=".", new_line=False):
     if not new_line:
         print(message, end="")
     else:
@@ -52,8 +53,9 @@ def _print_debug(string):
     #  which verify that output is correct.
     # Use the line below if you want output printed during tests.
     # if(constants.debug is True or 'nose' in sys.modules.keys()):
-    if(constants.debug is True):
+    if constants.debug is True:
         _print(string)
+
 
 def _print(s):
     try:
@@ -61,6 +63,6 @@ def _print(s):
     except UnicodeEncodeError:
         for c in s:
             try:
-                print(c, end='')
+                print(c, end="")
             except UnicodeEncodeError:
-                print('?', end='')
+                print("?", end="")

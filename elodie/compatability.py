@@ -12,7 +12,7 @@ def _decode(string, encoding=sys.getfilesystemencoding()):
     So we do a few checks to see if the string is ascii or unicode.
     Then we decode it if needed.
     """
-    if hasattr(string, 'decode'):
+    if hasattr(string, "decode"):
         # If the string is already unicode we return it.
         try:
             if isinstance(string, unicode):
@@ -24,18 +24,20 @@ def _decode(string, encoding=sys.getfilesystemencoding()):
 
     return string
 
+
 def _bytes(string):
     if constants.python_version == 3:
-        return bytes(string, 'utf8')
+        return bytes(string, "utf8")
     else:
         return bytes(string)
+
 
 def _copyfile(src, dst):
     # shutil.copy seems slow, changing to streaming according to
     # http://stackoverflow.com/questions/22078621/python-how-to-copy-files-fast  # noqa
     # Python 3 hangs using open/write method so we proceed with shutil.copy
     #  and only perform the optimized write for Python 2.
-    if (constants.python_version == 3):
+    if constants.python_version == 3:
         # Do not use copy2(), it will have an issue when copying to a
         #  network/mounted drive.
         # Using copy and manual set_date_from_filename gets the job done.
@@ -70,11 +72,11 @@ def _copyfile(src, dst):
             pass
 
 
-# If you want cross-platform overwriting of the destination, 
+# If you want cross-platform overwriting of the destination,
 # use os.replace() instead of rename().
 # https://docs.python.org/3/library/os.html#os.rename
 def _rename(src, dst):
-    if (constants.python_version == 3):
+    if constants.python_version == 3:
         return os.replace(src, dst)
     else:
         return os.rename(src, dst)

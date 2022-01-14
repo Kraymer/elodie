@@ -17,6 +17,7 @@ import six
 from elodie.external.pyexiftool import ExifTool
 from elodie.media.base import Base
 
+
 class Media(Base):
 
     """The base class for all media objects.
@@ -24,31 +25,28 @@ class Media(Base):
     :param str source: The fully qualified path to the video file.
     """
 
-    __name__ = 'Media'
+    __name__ = "Media"
 
-    d_coordinates = {
-        'latitude': 'latitude_ref',
-        'longitude': 'longitude_ref'
-    }
+    d_coordinates = {"latitude": "latitude_ref", "longitude": "longitude_ref"}
 
     def __init__(self, source=None):
         super(Media, self).__init__(source)
         self.exif_map = {
-            'date_taken': [
-                'EXIF:DateTimeOriginal',
-                'EXIF:CreateDate',
-                'EXIF:ModifyDate'
+            "date_taken": [
+                "EXIF:DateTimeOriginal",
+                "EXIF:CreateDate",
+                "EXIF:ModifyDate",
             ]
         }
-        self.camera_make_keys = ['EXIF:Make', 'QuickTime:Make']
-        self.camera_model_keys = ['EXIF:Model', 'QuickTime:Model']
-        self.album_keys = ['XMP-xmpDM:Album', 'XMP:Album']
-        self.title_key = 'XMP:Title'
-        self.latitude_keys = ['EXIF:GPSLatitude']
-        self.longitude_keys = ['EXIF:GPSLongitude']
-        self.latitude_ref_key = 'EXIF:GPSLatitudeRef'
-        self.longitude_ref_key = 'EXIF:GPSLongitudeRef'
-        self.original_name_key = 'XMP:OriginalFileName'
+        self.camera_make_keys = ["EXIF:Make", "QuickTime:Make"]
+        self.camera_model_keys = ["EXIF:Model", "QuickTime:Model"]
+        self.album_keys = ["XMP-xmpDM:Album", "XMP:Album"]
+        self.title_key = "XMP:Title"
+        self.latitude_keys = ["EXIF:GPSLatitude"]
+        self.longitude_keys = ["EXIF:GPSLongitude"]
+        self.latitude_ref_key = "EXIF:GPSLatitudeRef"
+        self.longitude_ref_key = "EXIF:GPSLongitudeRef"
+        self.original_name_key = "XMP:OriginalFileName"
         self.set_gps_ref = True
         self.exif_metadata = None
 
@@ -57,7 +55,7 @@ class Media(Base):
 
         :returns: None or string
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         exiftool_attributes = self.get_exiftool_attributes()
@@ -70,7 +68,7 @@ class Media(Base):
 
         return None
 
-    def get_coordinate(self, type='latitude'):
+    def get_coordinate(self, type="latitude"):
         """Get latitude or longitude of media from EXIF
 
         :param str type: Type of coordinate to get. Either "latitude" or
@@ -103,14 +101,15 @@ class Media(Base):
 
             # TODO: verify that we need to check ref key
             #   when self.set_gps_ref != True
-            if type == 'latitude' and key in self.latitude_keys:
-                if self.latitude_ref_key in exif and \
-                        exif[self.latitude_ref_key] == 'S':
+            if type == "latitude" and key in self.latitude_keys:
+                if self.latitude_ref_key in exif and exif[self.latitude_ref_key] == "S":
                     direction_multiplier = -1.0
                 return this_coordinate * direction_multiplier
-            elif type == 'longitude' and key in self.longitude_keys:
-                if self.longitude_ref_key in exif and \
-                        exif[self.longitude_ref_key] == 'W':
+            elif type == "longitude" and key in self.longitude_keys:
+                if (
+                    self.longitude_ref_key in exif
+                    and exif[self.longitude_ref_key] == "W"
+                ):
                     direction_multiplier = -1.0
                 return this_coordinate * direction_multiplier
 
@@ -123,8 +122,8 @@ class Media(Base):
         """
         source = self.source
 
-        #Cache exif metadata results and use if already exists for media
-        if(self.exif_metadata is None):
+        # Cache exif metadata results and use if already exists for media
+        if self.exif_metadata is None:
             self.exif_metadata = ExifTool().get_metadata(source)
 
         if not self.exif_metadata:
@@ -137,7 +136,7 @@ class Media(Base):
 
         :returns: str
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         exiftool_attributes = self.get_exiftool_attributes()
@@ -156,7 +155,7 @@ class Media(Base):
 
         :returns: str
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         exiftool_attributes = self.get_exiftool_attributes()
@@ -175,7 +174,7 @@ class Media(Base):
 
         :returns: str
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         exiftool_attributes = self.get_exiftool_attributes()
@@ -183,7 +182,7 @@ class Media(Base):
         if exiftool_attributes is None:
             return None
 
-        if(self.original_name_key not in exiftool_attributes):
+        if self.original_name_key not in exiftool_attributes:
             return None
 
         return exiftool_attributes[self.original_name_key]
@@ -193,7 +192,7 @@ class Media(Base):
 
         :returns: str or None if no title is set or not a valid media type
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         exiftool_attributes = self.get_exiftool_attributes()
@@ -201,14 +200,13 @@ class Media(Base):
         if exiftool_attributes is None:
             return None
 
-        if(self.title_key not in exiftool_attributes):
+        if self.title_key not in exiftool_attributes:
             return None
 
         return exiftool_attributes[self.title_key]
 
     def reset_cache(self):
-        """Resets any internal cache
-        """
+        """Resets any internal cache"""
         self.exiftool_attributes = None
         self.exif_metadata = None
         super(Media, self).reset_cache()
@@ -219,7 +217,7 @@ class Media(Base):
         :param str name: Name of album
         :returns: bool
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         tags = {self.album_keys[0]: album}
@@ -234,12 +232,12 @@ class Media(Base):
         :param datetime time: datetime object of when the photo was taken
         :returns: bool
         """
-        if(time is None):
+        if time is None:
             return False
 
         tags = {}
-        formatted_time = time.strftime('%Y:%m:%d %H:%M:%S')
-        for key in self.exif_map['date_taken']:
+        formatted_time = time.strftime("%Y:%m:%d %H:%M:%S")
+        for key in self.exif_map["date_taken"]:
             tags[key] = formatted_time
 
         status = self.__set_tags(tags)
@@ -247,7 +245,7 @@ class Media(Base):
         return status
 
     def set_location(self, latitude, longitude):
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         # The lat/lon _keys array has an order of precedence.
@@ -263,10 +261,10 @@ class Media(Base):
         # That's because the lat/lon are absolute values.
         if self.set_gps_ref:
             if latitude < 0:
-                tags[self.latitude_ref_key] = 'S'
+                tags[self.latitude_ref_key] = "S"
 
             if longitude < 0:
-                tags[self.longitude_ref_key] = 'W'
+                tags[self.longitude_ref_key] = "W"
 
         status = self.__set_tags(tags)
         self.reset_cache()
@@ -278,7 +276,7 @@ class Media(Base):
 
         :returns: True, False, None
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         # If EXIF original name tag is set then we return.
@@ -301,10 +299,10 @@ class Media(Base):
         :param str title: Title of the photo.
         :returns: bool
         """
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
-        if(title is None):
+        if title is None:
             return None
 
         tags = {self.title_key: title}
@@ -314,12 +312,12 @@ class Media(Base):
         return status
 
     def __set_tags(self, tags):
-        if(not self.is_valid()):
+        if not self.is_valid():
             return None
 
         source = self.source
 
-        status = ''
-        status = ExifTool().set_tags(tags,source)
+        status = ""
+        status = ExifTool().set_tags(tags, source)
 
-        return status != ''
+        return status != ""

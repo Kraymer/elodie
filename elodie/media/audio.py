@@ -17,10 +17,10 @@ class Audio(Video):
     :param str source: The fully qualified path to the audio file.
     """
 
-    __name__ = 'Audio'
+    __name__ = "Audio"
 
     #: Valid extensions for audio files.
-    extensions = ('m4a',)
+    extensions = ("m4a",)
 
     def __init__(self, source=None):
         super(Audio, self).__init__(source)
