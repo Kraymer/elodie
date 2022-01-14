@@ -1,4 +1,4 @@
-> :fork_and_knife: _Please read [Fork.md](https://github.com/Kraymer/elodie/edit/master/Fork.md) for the motivations behind this fork_
+> **WTF:fork_and_knife:?!**  _Please read [Fork.md](https://github.com/Kraymer/elodie/blob/master/Fork.md) for the motivations behind this fork_
 
 # Hello, I'm Elodie
 ~~ *Your Personal EXIF-based Photo, Video and Audio Assistant* ~~
