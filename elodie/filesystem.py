@@ -220,10 +220,14 @@ class FileSystem(object):
 
         config = load_config()
 
-        if('File' in config and 'capitalization' in config['File'] and config['File']['capitalization'] == 'upper'):
-            return name.upper()
-        else:
-            return name.lower()
+        if "File" in config and "capitalization" in config["File"]:
+            if config["File"]["capitalization"] == "upper":
+                name = name.upper()
+            else:
+                name = name.lower()
+
+        name = name.replace(" ", "_")
+        return name
 
     def get_file_name_definition(self):
         """Returns a list of folder definitions.
