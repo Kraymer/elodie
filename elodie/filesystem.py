@@ -371,6 +371,9 @@ class FileSystem(object):
                     # We break as soon as we have a value to append
                     # Else we continue for fallbacks
                     break
+        path = [
+            x.replace(" ", "_").replace("Unknown_Location", "Unknown") for x in path
+        ]
         return os.path.join(*path)
 
     def get_dynamic_path(self, part, mask, metadata):
